@@ -9,8 +9,18 @@ using System.Threading.Tasks;
 
 namespace POE.Loader
 {
-    public class Xyz
+    public class Xyz : IGridViewDisplay
     {
+        private Xyz(Xyz cloneFrom)
+        {
+            this.Url = cloneFrom.Url;
+            this.IsValid = cloneFrom.IsValid;
+            this.IsFoundItems = cloneFrom.IsFoundItems;
+            this.Timestamp = cloneFrom.Timestamp;
+            this.Raws = cloneFrom.Raws;
+            this.Items = cloneFrom.Items;
+            this.PreviousResult = cloneFrom.PreviousResult;
+        }
         private Xyz(string url)
         {
             this.Url = url;
@@ -26,6 +36,7 @@ namespace POE.Loader
 
         private void Init()
         {
+            this.IsValid = false;
             this.IsFoundItems = false;
             this.Raws = new List<string>();
             this.Items = new List<Data.ItemInfo>();
@@ -35,7 +46,7 @@ namespace POE.Loader
         private void GetInfo()
         {
             this.Init();
-            
+
             var req = WebRequest.CreateHttp(this.Url);
             using (var resp = req.GetResponse())
             {
@@ -61,7 +72,10 @@ namespace POE.Loader
                                 isStartFetch = true;
                         }
                         if (isStartFetch && s.Equals("<!-- PC-市集-物品市集-RWD -->"))
+                        {
+                            this.IsValid = true;
                             break;
+                        }
                         if (isStartFetch)
                             this.Raws.Add(s);
                     }
@@ -73,8 +87,16 @@ namespace POE.Loader
             this.Timestamp = DateTime.Now;
         }
 
+        private Xyz Clone()
+        {
+            var xyz = new Xyz(this);
+            return xyz;
+        }
+
         public void Reload()
         {
+            this.PreviousResult = this.Clone();
+
             this.GetInfo();
         }
 
@@ -84,7 +106,7 @@ namespace POE.Loader
             var parser = new HtmlParser();
             var dom = parser.Parse(html);
             var itemTrs = dom.QuerySelectorAll("table#xyz_items > tbody > tr");
-            foreach(var itemTr in itemTrs)
+            foreach (var itemTr in itemTrs)
             {
                 var nameSpan = itemTr.QuerySelector("span[class=\"item_unique\"]");
                 var name = nameSpan.TextContent;
@@ -103,6 +125,8 @@ namespace POE.Loader
 
         public string Url { get; private set; }
 
+        public bool IsValid { get; private set; }
+
         public bool IsFoundItems { get; private set; }
 
         public DateTime Timestamp { get; private set; }
@@ -110,5 +134,34 @@ namespace POE.Loader
         public List<string> Raws { get; private set; }
 
         public List<Data.ItemInfo> Items { get; private set; }
+
+        public Xyz PreviousResult { get; private set; }
+
+        string IGridViewDisplay.ItemName
+        {
+            get
+            {
+                if (this.Items.Count > 0)
+                    return this.Items.First().Name;
+                return "unknown";
+            }
+        }
+
+        string IGridViewDisplay.Url => this.Url;
+
+        int IGridViewDisplay.ItemCount => this.Items.Count;
+
+        string IGridViewDisplay.MinPrice
+        {
+            get
+            {
+                var item = this.Items.OrderBy(x => x.Price).FirstOrDefault();
+                if (item != null)
+                    return $"{item.Price} {item.PriceUnit}";
+                return "";
+            }
+        }
+
+        DateTime IGridViewDisplay.Timestamp => this.Timestamp;
     }
 }

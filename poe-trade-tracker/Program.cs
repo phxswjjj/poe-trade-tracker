@@ -16,7 +16,7 @@ namespace POE
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FrmTest());
+            Application.Run(new FrmMain());
         }
     }
 }

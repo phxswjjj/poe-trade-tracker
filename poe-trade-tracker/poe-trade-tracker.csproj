@@ -65,6 +65,7 @@
       <DependentUpon>FrmTest.cs</DependentUpon>
     </Compile>
     <Compile Include="Loader\Data\ItemInfo.cs" />
+    <Compile Include="Loader\IGridViewDisplay.cs" />
     <Compile Include="Loader\Xyz.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
