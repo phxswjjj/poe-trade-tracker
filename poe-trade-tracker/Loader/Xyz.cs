@@ -14,16 +14,29 @@ namespace POE.Loader
         private Xyz(string url)
         {
             this.Url = url;
-            this.IsFoundItems = false;
-            this.Timestamp = DateTime.Now;
-            this.Items = new List<Data.ItemInfo>();
+            this.Init();
         }
         public static Xyz Create(string url)
         {
             var xyz = new Xyz(url);
+            xyz.GetInfo();
 
-            var list = new List<string>();
-            var req = WebRequest.CreateHttp(url);
+            return xyz;
+        }
+
+        private void Init()
+        {
+            this.IsFoundItems = false;
+            this.Raws = new List<string>();
+            this.Items = new List<Data.ItemInfo>();
+            this.Timestamp = DateTime.Now;
+        }
+
+        private void GetInfo()
+        {
+            this.Init();
+            
+            var req = WebRequest.CreateHttp(this.Url);
             using (var resp = req.GetResponse())
             {
                 using (var sr = new StreamReader(resp.GetResponseStream()))
@@ -42,7 +55,7 @@ namespace POE.Loader
                             if (s.StartsWith("</script><h4>"))
                             {
                                 isStartFetch = true;
-                                xyz.IsFoundItems = true;
+                                this.IsFoundItems = true;
                             }
                             else if (s.StartsWith("</script>沒有資料"))
                                 isStartFetch = true;
@@ -50,15 +63,19 @@ namespace POE.Loader
                         if (isStartFetch && s.Equals("<!-- PC-市集-物品市集-RWD -->"))
                             break;
                         if (isStartFetch)
-                            list.Add(s);
+                            this.Raws.Add(s);
                     }
                 }
             }
-            xyz.Raws = list;
-            if(xyz.IsFoundItems)
-                xyz.ParseItems();
+            if (this.IsFoundItems)
+                this.ParseItems();
 
-            return xyz;
+            this.Timestamp = DateTime.Now;
+        }
+
+        public void Reload()
+        {
+            this.GetInfo();
         }
 
         private void ParseItems()
