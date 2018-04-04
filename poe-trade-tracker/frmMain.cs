@@ -54,7 +54,7 @@ namespace POE
             if (list == null)
                 list = new BindingList<Loader.IGridViewDisplay>();
 
-            var url = txtUrl.Text.Trim();
+            var url = TxtUrl.Text.Trim();
             var xyz = Loader.Xyz.Create(url);
 
             if (xyz != null && xyz.IsValid)
@@ -63,10 +63,10 @@ namespace POE
             gvUrls.AutoGenerateColumns = false;
             gvUrls.DataSource = list;
 
-            txtUrl.Text = "";
+            TxtUrl.Text = "";
         }
 
-        private void txtUrl_KeyPress(object sender, KeyPressEventArgs e)
+        private void TxtUrl_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar.Equals(Convert.ToChar(13)))
             {
@@ -103,11 +103,15 @@ namespace POE
 
                 foreach(var display in list)
                 {
-                    if(display is Loader.ILoader)
+                    switch(display)
                     {
-                        var loader = (Loader.ILoader)display;
-                        loader.Reload();
-                        Console.WriteLine($"{display.ItemName} reloaded at {display.Timestamp}");
+                        case Loader.ILoader loader:
+                            loader.Reload();
+                            Console.WriteLine($"{display.ItemName} reloaded at {display.Timestamp}");
+                            break;
+                        default:
+                            Console.WriteLine($"{display.ItemName} is not ILoader");
+                            break;
                     }
                 }
 
