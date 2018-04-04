@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace POE.Loader
 {
-    interface IGridViewDisplay
+    public interface IGridViewDisplay
     {
         string ItemName { get; }
         string Url { get; }

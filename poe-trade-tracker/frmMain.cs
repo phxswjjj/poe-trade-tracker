@@ -22,10 +22,38 @@ namespace POE
             InitializeComponent();
         }
 
+        private void AddMonitorList(string url)
+        {
+            var gvUrls = (DataGridView)this.Controls.Find("GvUrls", false).First();
+            var list = gvUrls.DataSource as BindingList<Loader.IGridViewDisplay>;
+            if (list == null)
+                list = new BindingList<Loader.IGridViewDisplay>();
+
+            var xyz = Loader.Xyz.Create(url);
+
+            if (xyz != null && xyz.IsValid)
+                list.Add(xyz);
+
+            gvUrls.AutoGenerateColumns = false;
+            gvUrls.DataSource = list;
+        }
+
+        private void PreloadQueryHistory()
+        {
+            using (var session = Repo.Marcello.CreateSession())
+            {
+                var queryFile = session["poe.data"];
+                var queryCollection = queryFile.Collection<Repo.Query, string>("query", q => q.Url);
+
+                foreach (var query in queryCollection.All)
+                    AddMonitorList(query.Url);
+            }
+        }
+
         private void FrmMain_Load(object sender, EventArgs e)
         {
             scheduler = Quartz.Impl.StdSchedulerFactory.GetDefaultScheduler();
-            
+
             var job = JobBuilder.Create<SimpleJob>()
                 .WithIdentity("Tracker", "POE")
                 .SetJobData(new JobDataMap() { { "GvUrls", (DataGridView)this.Controls.Find("GvUrls", false).First() } })
@@ -39,29 +67,43 @@ namespace POE
             scheduler.ScheduleJob(job, jobTrigger);
 
             scheduler.Start();
+
+            PreloadQueryHistory();
         }
 
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if(scheduler != null)
+            if (scheduler != null)
                 scheduler.Shutdown(false);
-        }
 
-        private void BtnAddUrl_Click(object sender, EventArgs e)
-        {
             var gvUrls = (DataGridView)this.Controls.Find("GvUrls", false).First();
+
             var list = gvUrls.DataSource as BindingList<Loader.IGridViewDisplay>;
             if (list == null)
                 list = new BindingList<Loader.IGridViewDisplay>();
 
+            using (var session = Repo.Marcello.CreateSession())
+            {
+                var queryFile = session["poe.data"];
+                var queryCollection = queryFile.Collection<Repo.Query, string>("query", q => q.Url);
+
+                var delUrls = from q in queryCollection.All
+                              select q.Url;
+                session.Transaction(() =>
+                {
+                    foreach (var url in delUrls.ToList())
+                        queryCollection.Destroy(url);
+
+                    foreach (var display in list)
+                        queryCollection.Persist(new Repo.Query(display));
+                });
+            }
+        }
+
+        private void BtnAddUrl_Click(object sender, EventArgs e)
+        {
             var url = TxtUrl.Text.Trim();
-            var xyz = Loader.Xyz.Create(url);
-
-            if (xyz != null && xyz.IsValid)
-                list.Add(xyz);
-
-            gvUrls.AutoGenerateColumns = false;
-            gvUrls.DataSource = list;
+            AddMonitorList(url);
 
             TxtUrl.Text = "";
         }
@@ -101,9 +143,9 @@ namespace POE
                 if (list == null)
                     return;
 
-                foreach(var display in list)
+                foreach (var display in list)
                 {
-                    switch(display)
+                    switch (display)
                     {
                         case Loader.ILoader loader:
                             loader.Reload();
@@ -115,7 +157,7 @@ namespace POE
                     }
                 }
 
-                if(gvUrls.InvokeRequired)
+                if (gvUrls.InvokeRequired)
                     gvUrls.Invoke((Action)(() => gvUrls.Refresh()));
             }
         }
