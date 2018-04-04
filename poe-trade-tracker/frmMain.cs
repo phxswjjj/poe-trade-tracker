@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Quartz;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,6 +15,8 @@ namespace POE
 {
     public partial class FrmMain : Form
     {
+        IScheduler scheduler = null;
+
         public FrmMain()
         {
             InitializeComponent();
@@ -21,7 +24,27 @@ namespace POE
 
         private void FrmMain_Load(object sender, EventArgs e)
         {
+            scheduler = Quartz.Impl.StdSchedulerFactory.GetDefaultScheduler();
+            
+            var job = JobBuilder.Create<SimpleJob>()
+                .WithIdentity("Tracker", "POE")
+                .SetJobData(new JobDataMap() { { "GvUrls", (DataGridView)this.Controls.Find("GvUrls", false).First() } })
+                .RequestRecovery()
+                .Build();
 
+            var jobTrigger = TriggerBuilder.Create()
+                .WithCronSchedule("0 0/1 * * * ? *")
+                .Build();
+
+            scheduler.ScheduleJob(job, jobTrigger);
+
+            scheduler.Start();
+        }
+
+        private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if(scheduler != null)
+                scheduler.Shutdown(false);
         }
 
         private void BtnAddUrl_Click(object sender, EventArgs e)
@@ -34,7 +57,7 @@ namespace POE
             var url = txtUrl.Text.Trim();
             var xyz = Loader.Xyz.Create(url);
 
-            if (xyz.IsValid)
+            if (xyz != null && xyz.IsValid)
                 list.Add(xyz);
 
             gvUrls.AutoGenerateColumns = false;
@@ -49,6 +72,44 @@ namespace POE
             {
                 e.Handled = true;
                 BtnAddUrl_Click(BtnAddUrl, e);
+            }
+        }
+
+        private void GvUrls_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            var gvUrls = (DataGridView)sender;
+            if (gvUrls.Columns[e.ColumnIndex] is DataGridViewLinkColumn)
+            {
+                var list = gvUrls.DataSource as BindingList<Loader.IGridViewDisplay>;
+                if (list == null)
+                    return;
+                var item = list[e.RowIndex];
+                System.Diagnostics.Process.Start(item.Url);
+            }
+        }
+
+        [DisallowConcurrentExecution]
+        private class SimpleJob : IJob
+        {
+            public void Execute(IJobExecutionContext context)
+            {
+                var gvUrls = (DataGridView)context.JobDetail.JobDataMap["GvUrls"];
+                var list = gvUrls.DataSource as BindingList<Loader.IGridViewDisplay>;
+                if (list == null)
+                    return;
+
+                foreach(var display in list)
+                {
+                    if(display is Loader.ILoader)
+                    {
+                        var loader = (Loader.ILoader)display;
+                        loader.Reload();
+                        Console.WriteLine($"{display.ItemName} reloaded at {display.Timestamp}");
+                    }
+                }
+
+                if(gvUrls.InvokeRequired)
+                    gvUrls.Invoke((Action)(() => gvUrls.Refresh()));
             }
         }
     }

@@ -42,6 +42,7 @@
             // 
             // GvUrls
             // 
+            this.GvUrls.AllowUserToAddRows = false;
             this.GvUrls.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -58,6 +59,7 @@
             this.GvUrls.RowTemplate.Height = 24;
             this.GvUrls.Size = new System.Drawing.Size(698, 369);
             this.GvUrls.TabIndex = 4;
+            this.GvUrls.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.GvUrls_CellClick);
             // 
             // txtUrl
             // 
@@ -140,6 +142,7 @@
             this.Controls.Add(this.txtUrl);
             this.Name = "FrmMain";
             this.Text = "Form1";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmMain_FormClosing);
             this.Load += new System.EventHandler(this.FrmMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.GvUrls)).EndInit();
             this.ResumeLayout(false);

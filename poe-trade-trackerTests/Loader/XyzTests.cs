@@ -12,6 +12,11 @@ namespace POE.Loader.Tests
     public class XyzTests
     {
         [TestMethod()]
+        public void Create_UrlEmpty()
+        {
+            Assert.IsNull(Xyz.Create(""));
+        }
+        [TestMethod()]
         public void Create_SiteNotFound()
         {
             Assert.ThrowsException<System.Net.WebException>(() =>

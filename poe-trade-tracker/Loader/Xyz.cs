@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace POE.Loader
 {
-    public class Xyz : IGridViewDisplay
+    public class Xyz : ILoader, IGridViewDisplay
     {
         private Xyz(Xyz cloneFrom)
         {
@@ -29,7 +29,14 @@ namespace POE.Loader
         public static Xyz Create(string url)
         {
             var xyz = new Xyz(url);
-            xyz.GetInfo();
+            try
+            {
+                xyz.GetInfo();
+            }
+            catch (System.UriFormatException)
+            {
+                return null;
+            }
 
             return xyz;
         }
