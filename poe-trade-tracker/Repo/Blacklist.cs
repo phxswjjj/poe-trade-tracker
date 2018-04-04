@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace POE.Loader
+namespace POE.Repo
 {
-    interface ILoader
+    public class Blacklist
     {
-        void Reload();
-
-        void SetBlacklist(IEnumerable<string> blacklists);
+        public string Account { get; set; }
     }
 }

@@ -41,8 +41,13 @@ namespace POE
             var priceUnitImg = priceSpan.QuerySelector("img");
             var priceUnit = priceUnitImg.GetAttribute("title");
 
+            var accountHref = itemTr.QuerySelector("a.xyz_user2");
+            var href = accountHref.GetAttribute("href");
+            var hrefUri = new Uri(href);
+            var account = hrefUri.Segments.Last();
+
             var s = $"name={name}, price={price}, priceUnit={priceUnit}";
-            richTextBox1.Text = s;
+            richTextBox1.Text = account;
         }
     }
 }

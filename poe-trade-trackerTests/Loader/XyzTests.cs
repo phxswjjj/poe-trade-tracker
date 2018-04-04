@@ -45,5 +45,16 @@ namespace POE.Loader.Tests
             var xyz = Xyz.Create("http://poedb.tw/xyz.php?name=%E5%AD%B8%E5%AF%8C%E4%B9%8B%E7%AD%86&league=Warbands&status=1&boi=9&boc_min=1&boc_max=0");
             Assert.IsFalse(xyz.IsFoundItems);
         }
+        [TestMethod()]
+        public void SetBlacklist()
+        {
+            var xyz = Xyz.Create("http://poedb.tw/xyz.php?name=%E5%AD%B8%E5%AF%8C%E4%B9%8B%E7%AD%86&league=Warbands&status=1&boi=9&boc_min=1&boc_max=3");
+            Assert.IsTrue(xyz.IsFoundItems);
+            Assert.IsTrue(xyz.Items.Count > 0);
+
+            var blacklists = xyz.Items.Select(item => item.Account).ToList();
+            xyz.SetBlacklist(blacklists);
+            Assert.AreEqual(0, xyz.Items.Count);
+        }
     }
 }

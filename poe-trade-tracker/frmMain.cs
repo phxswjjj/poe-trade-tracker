@@ -16,6 +16,7 @@ namespace POE
     public partial class FrmMain : Form
     {
         IScheduler scheduler = null;
+        List<string> blacklists = null;
 
         public FrmMain()
         {
@@ -30,6 +31,8 @@ namespace POE
                 list = new BindingList<Loader.IGridViewDisplay>();
 
             var xyz = Loader.Xyz.Create(url, itemName);
+            if (this.blacklists != null)
+                xyz.SetBlacklist(blacklists);
 
             if (xyz != null && xyz.IsValid)
                 list.Add(xyz);
@@ -46,11 +49,20 @@ namespace POE
         {
             using (var session = Repo.Marcello.CreateSession())
             {
-                var queryFile = session["poe.data"];
+                var queryFile = session["query.dat"];
                 var queryCollection = queryFile.Collection<Repo.Query, string>("query", q => q.Url);
 
                 foreach (var query in queryCollection.All)
                     AddMonitorList(query.Url, query.ItemName);
+            }
+        }
+        private void LoadBlacklist()
+        {
+            using (var session = Repo.Marcello.CreateSession())
+            {
+                var blacklistFile = session["blacklist.dat"];
+                var blacklistCollection = blacklistFile.Collection<Repo.Blacklist, string>("blacklist", b => b.Account);
+                blacklists = blacklistCollection.All.Select(b => b.Account).ToList();
             }
         }
 
@@ -72,13 +84,42 @@ namespace POE
 
             scheduler.Start();
 
+            LoadBlacklist();
+
             PreloadQueryHistory();
+        }
+
+        private void FrmMain_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Control && e.KeyCode == Keys.B)
+            {
+                var frm = new FrmBlacklist();
+                frm.ShowDialog(this);
+
+                LoadBlacklist();
+                
+                var gvUrls = (DataGridView)this.Controls.Find("GvUrls", false).First();
+                var list = gvUrls.DataSource as BindingList<Loader.IGridViewDisplay>;
+                if(list != null)
+                {
+                    foreach (var display in list)
+                    {
+                        switch (display)
+                        {
+                            case Loader.ILoader loader:
+                                loader.SetBlacklist(blacklists);
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            this.Cursor = Cursors.WaitCursor;
             if (scheduler != null)
-                scheduler.Shutdown(false);
+                scheduler.Shutdown(true);
 
             var gvUrls = (DataGridView)this.Controls.Find("GvUrls", false).First();
 
@@ -88,7 +129,7 @@ namespace POE
 
             using (var session = Repo.Marcello.CreateSession())
             {
-                var queryFile = session["poe.data"];
+                var queryFile = session["query.dat"];
                 var queryCollection = queryFile.Collection<Repo.Query, string>("query", q => q.Url);
 
                 var delUrls = from q in queryCollection.All
@@ -102,6 +143,8 @@ namespace POE
                         queryCollection.Persist(new Repo.Query(display));
                 });
             }
+
+            this.Cursor = Cursors.Default;
         }
 
         private void BtnAddUrl_Click(object sender, EventArgs e)

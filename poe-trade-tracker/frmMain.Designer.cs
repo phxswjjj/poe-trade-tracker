@@ -29,15 +29,15 @@
         private void InitializeComponent()
         {
             this.GvUrls = new System.Windows.Forms.DataGridView();
-            this.TxtUrl = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.BtnAddUrl = new System.Windows.Forms.Button();
             this.gvColItemPreview = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.gvColUrl = new System.Windows.Forms.DataGridViewLinkColumn();
             this.gvColItems = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.gvColItemMinPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.gvColMaxPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.gvColTimestamp = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TxtUrl = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.BtnAddUrl = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.GvUrls)).BeginInit();
             this.SuspendLayout();
             // 
@@ -62,34 +62,6 @@
             this.GvUrls.Size = new System.Drawing.Size(763, 369);
             this.GvUrls.TabIndex = 4;
             this.GvUrls.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.GvUrls_CellClick);
-            // 
-            // TxtUrl
-            // 
-            this.TxtUrl.Location = new System.Drawing.Point(86, 12);
-            this.TxtUrl.Name = "TxtUrl";
-            this.TxtUrl.Size = new System.Drawing.Size(519, 22);
-            this.TxtUrl.TabIndex = 0;
-            this.TxtUrl.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TxtUrl_KeyPress);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.label1.Location = new System.Drawing.Point(12, 12);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(68, 16);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Xyz URL";
-            // 
-            // BtnAddUrl
-            // 
-            this.BtnAddUrl.Location = new System.Drawing.Point(611, 10);
-            this.BtnAddUrl.Name = "BtnAddUrl";
-            this.BtnAddUrl.Size = new System.Drawing.Size(75, 23);
-            this.BtnAddUrl.TabIndex = 2;
-            this.BtnAddUrl.Text = "Add";
-            this.BtnAddUrl.UseVisualStyleBackColor = true;
-            this.BtnAddUrl.Click += new System.EventHandler(this.BtnAddUrl_Click);
             // 
             // gvColItemPreview
             // 
@@ -140,6 +112,34 @@
             this.gvColTimestamp.ReadOnly = true;
             this.gvColTimestamp.Width = 120;
             // 
+            // TxtUrl
+            // 
+            this.TxtUrl.Location = new System.Drawing.Point(86, 12);
+            this.TxtUrl.Name = "TxtUrl";
+            this.TxtUrl.Size = new System.Drawing.Size(519, 22);
+            this.TxtUrl.TabIndex = 0;
+            this.TxtUrl.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TxtUrl_KeyPress);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label1.Location = new System.Drawing.Point(12, 12);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(38, 16);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "URL";
+            // 
+            // BtnAddUrl
+            // 
+            this.BtnAddUrl.Location = new System.Drawing.Point(611, 10);
+            this.BtnAddUrl.Name = "BtnAddUrl";
+            this.BtnAddUrl.Size = new System.Drawing.Size(75, 23);
+            this.BtnAddUrl.TabIndex = 2;
+            this.BtnAddUrl.Text = "Add";
+            this.BtnAddUrl.UseVisualStyleBackColor = true;
+            this.BtnAddUrl.Click += new System.EventHandler(this.BtnAddUrl_Click);
+            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -149,10 +149,12 @@
             this.Controls.Add(this.BtnAddUrl);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.TxtUrl);
+            this.KeyPreview = true;
             this.Name = "FrmMain";
-            this.Text = "Monitor";
+            this.Text = "Tracker";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmMain_FormClosing);
             this.Load += new System.EventHandler(this.FrmMain_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FrmMain_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.GvUrls)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

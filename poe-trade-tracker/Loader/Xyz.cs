@@ -11,6 +11,7 @@ namespace POE.Loader
 {
     public class Xyz : ILoader, IGridViewDisplay
     {
+        private IEnumerable<string> _blacklists = null;
         private Xyz(Xyz cloneFrom)
         {
             this.Url = cloneFrom.Url;
@@ -104,6 +105,7 @@ namespace POE.Loader
                 this.ParseItems();
                 if (this.Items.Count > 0 && string.IsNullOrEmpty(this.ItemName))
                     this.ItemName = this.Items.First().Name;
+                ApplyBlacklist();
             }
 
             this.Timestamp = DateTime.Now;
@@ -122,6 +124,20 @@ namespace POE.Loader
             this.GetInfo();
         }
 
+        public void SetBlacklist(IEnumerable<string> blacklists)
+        {
+            this._blacklists = blacklists;
+            ApplyBlacklist();
+        }
+
+        private void ApplyBlacklist()
+        {
+            if (this._blacklists == null)
+                return;
+            foreach(var blacklist in this._blacklists)
+                this.Items.RemoveAll(item => item.Account.Equals(blacklist));
+        }
+
         private void ParseItems()
         {
             var html = string.Join(Environment.NewLine, this.Raws);
@@ -134,13 +150,17 @@ namespace POE.Loader
                 var name = nameSpan.TextContent;
 
                 var priceSpan = itemTr.QuerySelector("span[data-name=\"price\"]");
-
                 var price = int.Parse(priceSpan.GetAttribute("data-value"));
 
                 var priceUnitImg = priceSpan.QuerySelector("img");
                 var priceUnit = priceUnitImg.GetAttribute("title");
 
-                var item = new Data.ItemInfo(name, price, priceUnit);
+                var accountHref = itemTr.QuerySelector("a.xyz_user2");
+                var href = accountHref.GetAttribute("href");
+                var hrefUri = new Uri(href);
+                var account = hrefUri.Segments.Last();
+
+                var item = new Data.ItemInfo(name, price, priceUnit, account);
                 this.Items.Add(item);
             }
         }
