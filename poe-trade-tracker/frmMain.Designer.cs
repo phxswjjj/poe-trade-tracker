@@ -141,7 +141,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.TxtUrl);
             this.Name = "FrmMain";
-            this.Text = "Form1";
+            this.Text = "Monitor";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmMain_FormClosing);
             this.Load += new System.EventHandler(this.FrmMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.GvUrls)).EndInit();

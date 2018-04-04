@@ -22,20 +22,24 @@ namespace POE
             InitializeComponent();
         }
 
-        private void AddMonitorList(string url)
+        private void AddMonitorList(string url, string itemName)
         {
             var gvUrls = (DataGridView)this.Controls.Find("GvUrls", false).First();
             var list = gvUrls.DataSource as BindingList<Loader.IGridViewDisplay>;
             if (list == null)
                 list = new BindingList<Loader.IGridViewDisplay>();
 
-            var xyz = Loader.Xyz.Create(url);
+            var xyz = Loader.Xyz.Create(url, itemName);
 
             if (xyz != null && xyz.IsValid)
                 list.Add(xyz);
 
             gvUrls.AutoGenerateColumns = false;
             gvUrls.DataSource = list;
+        }
+        private void AddMonitorList(string url)
+        {
+            AddMonitorList(url, "");
         }
 
         private void PreloadQueryHistory()
@@ -46,7 +50,7 @@ namespace POE
                 var queryCollection = queryFile.Collection<Repo.Query, string>("query", q => q.Url);
 
                 foreach (var query in queryCollection.All)
-                    AddMonitorList(query.Url);
+                    AddMonitorList(query.Url, query.ItemName);
             }
         }
 

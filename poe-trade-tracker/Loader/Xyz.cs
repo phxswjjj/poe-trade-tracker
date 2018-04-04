@@ -16,17 +16,24 @@ namespace POE.Loader
             this.Url = cloneFrom.Url;
             this.IsValid = cloneFrom.IsValid;
             this.IsFoundItems = cloneFrom.IsFoundItems;
+            this.ItemName = cloneFrom.ItemName;
             this.Timestamp = cloneFrom.Timestamp;
             this.Raws = cloneFrom.Raws;
             this.Items = cloneFrom.Items;
             this.PreviousResult = cloneFrom.PreviousResult;
+        }
+        private Xyz(string url, string itemName)
+            : this(url)
+        {
+            if (!string.IsNullOrEmpty(itemName))
+                this.ItemName = itemName;
         }
         private Xyz(string url)
         {
             this.Url = url;
             this.Init();
         }
-        public static Xyz Create(string url)
+        public static Xyz Create(string url, string itemName)
         {
             var xyz = new Xyz(url);
             try
@@ -39,6 +46,10 @@ namespace POE.Loader
             }
 
             return xyz;
+        }
+        public static Xyz Create(string url)
+        {
+            return Create(url, "");
         }
 
         private void Init()
@@ -89,7 +100,11 @@ namespace POE.Loader
                 }
             }
             if (this.IsFoundItems)
+            {
                 this.ParseItems();
+                if (this.Items.Count > 0 && string.IsNullOrEmpty(this.ItemName))
+                    this.ItemName = this.Items.First().Name;
+            }
 
             this.Timestamp = DateTime.Now;
         }
@@ -136,6 +151,8 @@ namespace POE.Loader
 
         public bool IsFoundItems { get; private set; }
 
+        public string ItemName { get; private set; }
+
         public DateTime Timestamp { get; private set; }
 
         public List<string> Raws { get; private set; }
@@ -148,6 +165,8 @@ namespace POE.Loader
         {
             get
             {
+                if (!string.IsNullOrEmpty(this.ItemName))
+                    return this.ItemName;
                 if (this.Items.Count > 0)
                     return this.Items.First().Name;
                 return "unknown";
@@ -163,6 +182,17 @@ namespace POE.Loader
             get
             {
                 var item = this.Items.OrderBy(x => x.Price).FirstOrDefault();
+                if (item != null)
+                    return $"{item.Price} {item.PriceUnit}";
+                return "";
+            }
+        }
+
+        string IGridViewDisplay.MaxPrice
+        {
+            get
+            {
+                var item = this.Items.OrderByDescending(x => x.Price).FirstOrDefault();
                 if (item != null)
                     return $"{item.Price} {item.PriceUnit}";
                 return "";

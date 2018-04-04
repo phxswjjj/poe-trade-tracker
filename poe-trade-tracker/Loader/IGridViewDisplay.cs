@@ -12,6 +12,7 @@ namespace POE.Loader
         string Url { get; }
         int ItemCount { get; }
         string MinPrice { get; }
+        string MaxPrice { get; }
         DateTime Timestamp { get; }
     }
 }
