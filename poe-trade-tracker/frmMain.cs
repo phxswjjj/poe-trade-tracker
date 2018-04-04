@@ -77,11 +77,14 @@ namespace POE
 
         private void GvUrls_CellClick(object sender, DataGridViewCellEventArgs e)
         {
+            if (e.ColumnIndex < 0)
+                return;
+
             var gvUrls = (DataGridView)sender;
             if (gvUrls.Columns[e.ColumnIndex] is DataGridViewLinkColumn)
             {
                 var list = gvUrls.DataSource as BindingList<Loader.IGridViewDisplay>;
-                if (list == null)
+                if (list == null || list.Count <= e.RowIndex)
                     return;
                 var item = list[e.RowIndex];
                 System.Diagnostics.Process.Start(item.Url);
