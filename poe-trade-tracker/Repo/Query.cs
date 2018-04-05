@@ -12,7 +12,8 @@ namespace POE.Repo
         public Query(Loader.IGridViewDisplay display)
         {
             this.Url = display.Url;
-            if(display.ItemCount > 0)
+            var name = display.OrgItemName;
+            if(!string.IsNullOrEmpty(name))
                 this.ItemName = display.ItemName;
         }
         public string Url { get; set; }

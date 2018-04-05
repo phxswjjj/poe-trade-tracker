@@ -36,7 +36,7 @@ namespace POE.Loader
         }
         public static Xyz Create(string url, string itemName)
         {
-            var xyz = new Xyz(url);
+            var xyz = new Xyz(url, itemName);
             try
             {
                 xyz.GetInfo();
@@ -134,7 +134,7 @@ namespace POE.Loader
         {
             if (this._blacklists == null)
                 return;
-            foreach(var blacklist in this._blacklists)
+            foreach (var blacklist in this._blacklists)
                 this.Items.RemoveAll(item => item.Account.Equals(blacklist));
         }
 
@@ -181,7 +181,7 @@ namespace POE.Loader
 
         public Xyz PreviousResult { get; private set; }
 
-        string IGridViewDisplay.ItemName
+        public string OrgItemName
         {
             get
             {
@@ -189,7 +189,18 @@ namespace POE.Loader
                     return this.ItemName;
                 if (this.Items.Count > 0)
                     return this.Items.First().Name;
-                return "unknown";
+                return string.Empty;
+            }
+        }
+        string IGridViewDisplay.ItemName
+        {
+            get
+            {
+                var name = this.OrgItemName;
+                if (string.IsNullOrEmpty(name))
+                    return "unknown";
+                else
+                    return name;
             }
         }
 

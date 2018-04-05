@@ -99,18 +99,19 @@ namespace POE
                 LoadBlacklist();
                 
                 var gvUrls = (DataGridView)this.Controls.Find("GvUrls", false).First();
-                var list = gvUrls.DataSource as BindingList<Loader.IGridViewDisplay>;
-                if(list != null)
+                switch(gvUrls.DataSource)
                 {
-                    foreach (var display in list)
-                    {
-                        switch (display)
+                    case BindingList<Loader.IGridViewDisplay> list:
+                        foreach (var display in list)
                         {
-                            case Loader.ILoader loader:
-                                loader.SetBlacklist(blacklists);
-                                break;
+                            switch (display)
+                            {
+                                case Loader.ILoader loader:
+                                    loader.SetBlacklist(blacklists);
+                                    break;
+                            }
                         }
-                    }
+                        break;
                 }
             }
         }

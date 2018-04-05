@@ -8,6 +8,7 @@ namespace POE.Loader
 {
     public interface IGridViewDisplay
     {
+        string OrgItemName { get; }
         string ItemName { get; }
         string Url { get; }
         int ItemCount { get; }
