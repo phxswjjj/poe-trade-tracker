@@ -181,7 +181,7 @@ namespace POE.Loader
 
         public Xyz PreviousResult { get; private set; }
 
-        public string OrgItemName
+        public string CurrentItemName
         {
             get
             {
@@ -196,7 +196,7 @@ namespace POE.Loader
         {
             get
             {
-                var name = this.OrgItemName;
+                var name = this.CurrentItemName;
                 if (string.IsNullOrEmpty(name))
                     return "unknown";
                 else
