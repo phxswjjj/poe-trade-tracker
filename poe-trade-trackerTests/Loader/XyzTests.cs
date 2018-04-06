@@ -31,7 +31,7 @@ namespace POE.Loader.Tests
             Assert.IsFalse(xyz.IsFoundItems);
         }
         [TestMethod()]
-        public void Create_Found()
+        public void Create_FoundUniqueItem()
         {
             var xyz = Xyz.Create("http://poedb.tw/xyz.php?name=%E5%AD%B8%E5%AF%8C%E4%B9%8B%E7%AD%86&league=Warbands&status=1&boi=9&boc_min=1&boc_max=3");
             Assert.IsTrue(xyz.IsFoundItems);
@@ -40,10 +40,25 @@ namespace POE.Loader.Tests
             Assert.AreEqual("崇高石", xyz.Items.First().PriceUnit);
         }
         [TestMethod()]
+        public void Create_FoundNormalItem()
+        {
+            var xyz = Xyz.Create("http://poedb.tw/xyz.php?name=%E5%A5%B3%E7%A5%9E%E7%A5%AD%E5%93%81&league=Warbands&status=1&boi=9&boc_min=1&boc_max=1");
+            Assert.IsTrue(xyz.IsFoundItems);
+
+            Assert.AreEqual("女神祭品", xyz.CurrentItemName);
+        }
+        [TestMethod()]
         public void Create_NotFound()
         {
             var xyz = Xyz.Create("http://poedb.tw/xyz.php?name=%E5%AD%B8%E5%AF%8C%E4%B9%8B%E7%AD%86&league=Warbands&status=1&boi=9&boc_min=1&boc_max=0");
             Assert.IsFalse(xyz.IsFoundItems);
+        }
+        [TestMethod()]
+        public void Create_NotFoundButHasQueryName()
+        {
+            var xyz = Xyz.Create("http://poedb.tw/xyz.php?name=%E7%84%A1%E7%9B%A1%E4%B9%8B%E8%A1%A3&league=Warbands&status=1&boi=1&boc_min=1&boc_max=1");
+            Assert.IsFalse(xyz.IsFoundItems);
+            Assert.AreEqual("無盡之衣", xyz.ItemName);
         }
         [TestMethod()]
         public void SetBlacklist()

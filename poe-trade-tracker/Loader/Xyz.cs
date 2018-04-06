@@ -40,6 +40,8 @@ namespace POE.Loader
             try
             {
                 xyz.GetInfo();
+                if (string.IsNullOrEmpty(xyz.ItemName))
+                    xyz.ParseUrl();
             }
             catch (System.UriFormatException)
             {
@@ -147,7 +149,12 @@ namespace POE.Loader
             foreach (var itemTr in itemTrs)
             {
                 var nameSpan = itemTr.QuerySelector("span[class=\"item_unique\"]");
-                var name = nameSpan.TextContent;
+                if(nameSpan == null)
+                {
+                    //normal item
+                    nameSpan = itemTr.QuerySelector("td:nth-child(2) > span:nth-child(2)[\"class\"]");
+                }
+                var name = nameSpan.TextContent.Trim();
 
                 var priceSpan = itemTr.QuerySelector("span[data-name=\"price\"]");
                 var price = int.Parse(priceSpan.GetAttribute("data-value"));
@@ -162,6 +169,17 @@ namespace POE.Loader
 
                 var item = new Data.ItemInfo(name, price, priceUnit, account);
                 this.Items.Add(item);
+            }
+        }
+        private void ParseUrl()
+        {
+            if (string.IsNullOrEmpty(this.ItemName))
+            {
+                var uri = new Uri(this.Url);
+                var queryStrings = System.Web.HttpUtility.ParseQueryString(uri.Query);
+                var name = queryStrings.Get("name");
+                if (!string.IsNullOrEmpty(name))
+                    this.ItemName = Uri.UnescapeDataString(name);
             }
         }
 
