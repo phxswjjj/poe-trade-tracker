@@ -40,8 +40,6 @@ namespace POE.Loader
             try
             {
                 xyz.GetInfo();
-                if (string.IsNullOrEmpty(xyz.ItemName))
-                    xyz.ParseUrl();
             }
             catch (System.UriFormatException)
             {
@@ -104,11 +102,13 @@ namespace POE.Loader
             }
             if (this.IsFoundItems)
             {
-                this.ParseItems();
+                this.ParseHtmlItems();
                 if (this.Items.Count > 0 && string.IsNullOrEmpty(this.ItemName))
                     this.ItemName = this.Items.First().Name;
                 ApplyBlacklist();
             }
+            if (string.IsNullOrEmpty(this.ItemName))
+                this.ParseUrl();
 
             this.Timestamp = DateTime.Now;
         }
@@ -140,7 +140,7 @@ namespace POE.Loader
                 this.Items.RemoveAll(item => item.Account.Equals(blacklist));
         }
 
-        private void ParseItems()
+        private void ParseHtmlItems()
         {
             var html = string.Join(Environment.NewLine, this.Raws);
             var parser = new HtmlParser();
