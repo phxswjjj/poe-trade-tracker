@@ -29,15 +29,14 @@
         private void InitializeComponent()
         {
             this.GvUrls = new System.Windows.Forms.DataGridView();
-            this.gvColItemPreview = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.gvColUrl = new System.Windows.Forms.DataGridViewLinkColumn();
-            this.gvColItems = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.gvColItemMinPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.gvColMaxPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.gvColTimestamp = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.TxtUrl = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.BtnAddUrl = new System.Windows.Forms.Button();
+            this.gvColItemPreview = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.gvColUrl = new System.Windows.Forms.DataGridViewLinkColumn();
+            this.gvColItems = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.GvColPriceRange = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.GvColQueryPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.GvUrls)).BeginInit();
             this.SuspendLayout();
             // 
@@ -52,9 +51,8 @@
             this.gvColItemPreview,
             this.gvColUrl,
             this.gvColItems,
-            this.gvColItemMinPrice,
-            this.gvColMaxPrice,
-            this.gvColTimestamp});
+            this.GvColPriceRange,
+            this.GvColQueryPrice});
             this.GvUrls.Location = new System.Drawing.Point(12, 40);
             this.GvUrls.Name = "GvUrls";
             this.GvUrls.ReadOnly = true;
@@ -62,55 +60,6 @@
             this.GvUrls.Size = new System.Drawing.Size(763, 369);
             this.GvUrls.TabIndex = 4;
             this.GvUrls.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.GvUrls_CellClick);
-            // 
-            // gvColItemPreview
-            // 
-            this.gvColItemPreview.DataPropertyName = "ItemName";
-            this.gvColItemPreview.Frozen = true;
-            this.gvColItemPreview.HeaderText = "ItemName";
-            this.gvColItemPreview.Name = "gvColItemPreview";
-            this.gvColItemPreview.ReadOnly = true;
-            this.gvColItemPreview.Width = 150;
-            // 
-            // gvColUrl
-            // 
-            this.gvColUrl.DataPropertyName = "Url";
-            this.gvColUrl.HeaderText = "Url";
-            this.gvColUrl.Name = "gvColUrl";
-            this.gvColUrl.ReadOnly = true;
-            this.gvColUrl.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.gvColUrl.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.gvColUrl.Width = 200;
-            // 
-            // gvColItems
-            // 
-            this.gvColItems.DataPropertyName = "ItemCount";
-            this.gvColItems.HeaderText = "Items";
-            this.gvColItems.Name = "gvColItems";
-            this.gvColItems.ReadOnly = true;
-            this.gvColItems.Width = 50;
-            // 
-            // gvColItemMinPrice
-            // 
-            this.gvColItemMinPrice.DataPropertyName = "MinPrice";
-            this.gvColItemMinPrice.HeaderText = "MinPrice";
-            this.gvColItemMinPrice.Name = "gvColItemMinPrice";
-            this.gvColItemMinPrice.ReadOnly = true;
-            // 
-            // gvColMaxPrice
-            // 
-            this.gvColMaxPrice.DataPropertyName = "MaxPrice";
-            this.gvColMaxPrice.HeaderText = "MaxPrice";
-            this.gvColMaxPrice.Name = "gvColMaxPrice";
-            this.gvColMaxPrice.ReadOnly = true;
-            // 
-            // gvColTimestamp
-            // 
-            this.gvColTimestamp.DataPropertyName = "Timestamp";
-            this.gvColTimestamp.HeaderText = "Timestamp";
-            this.gvColTimestamp.Name = "gvColTimestamp";
-            this.gvColTimestamp.ReadOnly = true;
-            this.gvColTimestamp.Width = 120;
             // 
             // TxtUrl
             // 
@@ -139,6 +88,45 @@
             this.BtnAddUrl.Text = "Add";
             this.BtnAddUrl.UseVisualStyleBackColor = true;
             this.BtnAddUrl.Click += new System.EventHandler(this.BtnAddUrl_Click);
+            // 
+            // gvColItemPreview
+            // 
+            this.gvColItemPreview.DataPropertyName = "ItemName";
+            this.gvColItemPreview.Frozen = true;
+            this.gvColItemPreview.HeaderText = "Item Name";
+            this.gvColItemPreview.Name = "gvColItemPreview";
+            this.gvColItemPreview.ReadOnly = true;
+            // 
+            // gvColUrl
+            // 
+            this.gvColUrl.DataPropertyName = "Url";
+            this.gvColUrl.HeaderText = "Url";
+            this.gvColUrl.Name = "gvColUrl";
+            this.gvColUrl.ReadOnly = true;
+            this.gvColUrl.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.gvColUrl.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
+            // gvColItems
+            // 
+            this.gvColItems.DataPropertyName = "ItemCount";
+            this.gvColItems.HeaderText = "Items";
+            this.gvColItems.Name = "gvColItems";
+            this.gvColItems.ReadOnly = true;
+            this.gvColItems.Width = 50;
+            // 
+            // GvColPriceRange
+            // 
+            this.GvColPriceRange.DataPropertyName = "PriceRange";
+            this.GvColPriceRange.HeaderText = "Sell Price";
+            this.GvColPriceRange.Name = "GvColPriceRange";
+            this.GvColPriceRange.ReadOnly = true;
+            // 
+            // GvColQueryPrice
+            // 
+            this.GvColQueryPrice.DataPropertyName = "QueryPrice";
+            this.GvColQueryPrice.HeaderText = "Query Price";
+            this.GvColQueryPrice.Name = "GvColQueryPrice";
+            this.GvColQueryPrice.ReadOnly = true;
             // 
             // FrmMain
             // 
@@ -169,9 +157,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn gvColItemPreview;
         private System.Windows.Forms.DataGridViewLinkColumn gvColUrl;
         private System.Windows.Forms.DataGridViewTextBoxColumn gvColItems;
-        private System.Windows.Forms.DataGridViewTextBoxColumn gvColItemMinPrice;
-        private System.Windows.Forms.DataGridViewTextBoxColumn gvColMaxPrice;
-        private System.Windows.Forms.DataGridViewTextBoxColumn gvColTimestamp;
+        private System.Windows.Forms.DataGridViewTextBoxColumn GvColPriceRange;
+        private System.Windows.Forms.DataGridViewTextBoxColumn GvColQueryPrice;
     }
 }
 

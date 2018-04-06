@@ -22,6 +22,7 @@ namespace POE.Loader
             this.Raws = cloneFrom.Raws;
             this.Items = cloneFrom.Items;
             this.PreviousResult = cloneFrom.PreviousResult;
+            this.Query = cloneFrom.Query;
         }
         private Xyz(string url, string itemName)
             : this(url)
@@ -107,7 +108,8 @@ namespace POE.Loader
                     this.ItemName = this.Items.First().Name;
                 ApplyBlacklist();
             }
-            if (string.IsNullOrEmpty(this.ItemName))
+
+            if (this.Query == null)
                 this.ParseUrl();
 
             this.Timestamp = DateTime.Now;
@@ -149,7 +151,7 @@ namespace POE.Loader
             foreach (var itemTr in itemTrs)
             {
                 var nameSpan = itemTr.QuerySelector("span[class=\"item_unique\"]");
-                if(nameSpan == null)
+                if (nameSpan == null)
                 {
                     //normal item
                     nameSpan = itemTr.QuerySelector("td:nth-child(2) > span:nth-child(2)[\"class\"]");
@@ -173,14 +175,25 @@ namespace POE.Loader
         }
         private void ParseUrl()
         {
-            if (string.IsNullOrEmpty(this.ItemName))
-            {
-                var uri = new Uri(this.Url);
-                var queryStrings = System.Web.HttpUtility.ParseQueryString(uri.Query);
-                var name = queryStrings.Get("name");
-                if (!string.IsNullOrEmpty(name))
-                    this.ItemName = Uri.UnescapeDataString(name);
-            }
+            var q = new Data.QueryCondition();
+            this.Query = q;
+            var uri = new Uri(this.Url);
+            var queryStrings = System.Web.HttpUtility.ParseQueryString(uri.Query);
+
+            var name = queryStrings.Get("name");
+            q.Name = name;
+            if (string.IsNullOrEmpty(this.ItemName) && !string.IsNullOrEmpty(name))
+                this.ItemName = Uri.UnescapeDataString(name);
+
+            int iCurrency;
+            if (int.TryParse(queryStrings.Get("boi"), out iCurrency) && iCurrency > 0)
+                q.Currency = (Data.CurrencyType)iCurrency;
+
+            int iPrice;
+            if (int.TryParse(queryStrings.Get("boc_min"), out iPrice) && iPrice > 0)
+                q.MinPrice = iPrice;
+            if (int.TryParse(queryStrings.Get("boc_max"), out iPrice) && iPrice > 0)
+                q.MaxPrice = iPrice;
         }
 
         public string Url { get; private set; }
@@ -199,10 +212,14 @@ namespace POE.Loader
 
         public Xyz PreviousResult { get; private set; }
 
+        public Data.QueryCondition Query { get; private set; }
+
         public string CurrentItemName
         {
             get
             {
+                if (!string.IsNullOrEmpty(this.Query.Name))
+                    return this.Query.Name;
                 if (!string.IsNullOrEmpty(this.ItemName))
                     return this.ItemName;
                 if (this.Items.Count > 0)
@@ -249,5 +266,43 @@ namespace POE.Loader
         }
 
         DateTime IGridViewDisplay.Timestamp => this.Timestamp;
+
+        string IGridViewDisplay.CurrentItemName => this.CurrentItemName;
+
+        string IGridViewDisplay.PriceRange
+        {
+            get
+            {
+                var sortedItems = this.Items.OrderBy(x => x.Price);
+                var firstItem = sortedItems.FirstOrDefault();
+                if (firstItem == null)
+                    return "";
+                var lastItem = sortedItems.Last();
+                if (firstItem.PriceUnit.Equals(firstItem.PriceUnit))
+                    return $"{firstItem.Price} ~ {lastItem.Price} {firstItem.PriceUnit}";
+                else
+                    return $"{firstItem.Price} {firstItem.PriceUnit} ~ {lastItem.Price} {lastItem.PriceUnit}";
+            }
+        }
+
+        string IGridViewDisplay.QueryPrice
+        {
+            get
+            {
+                var fromPriceString = "?";
+                var toPriceString = "?";
+                if (this.Query.MinPrice > 0)
+                    fromPriceString = this.Query.MinPrice.ToString();
+                if (this.Query.MaxPrice > 0)
+                    toPriceString = this.Query.MaxPrice.ToString();
+
+                var priceUnit = "unknown";
+                var miCurrency = typeof(Data.CurrencyType).GetMember(this.Query.Currency.ToString()).First();
+                var enumAttr = Attribute.GetCustomAttribute(miCurrency, typeof(Data.EnumAttribute)) as Data.EnumAttribute;
+                if (enumAttr != null)
+                    priceUnit = enumAttr.Description;
+                return $"{fromPriceString} ~ {toPriceString} {priceUnit}";
+            }
+        }
     }
 }

@@ -120,7 +120,10 @@ namespace POE
         {
             this.Cursor = Cursors.WaitCursor;
             if (scheduler != null)
+            {
+                scheduler.PauseAll();
                 scheduler.Shutdown(true);
+            }
 
             var gvUrls = (DataGridView)this.Controls.Find("GvUrls", false).First();
 

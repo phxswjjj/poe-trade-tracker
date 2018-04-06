@@ -54,11 +54,20 @@ namespace POE.Loader.Tests
             Assert.IsFalse(xyz.IsFoundItems);
         }
         [TestMethod()]
-        public void Create_NotFoundButHasQueryName()
+        public void Create_NotFoundButHasQueryConditions()
         {
             var xyz = Xyz.Create("http://poedb.tw/xyz.php?name=%E7%84%A1%E7%9B%A1%E4%B9%8B%E8%A1%A3&league=Warbands&status=1&boi=1&boc_min=1&boc_max=1");
             Assert.IsFalse(xyz.IsFoundItems);
             Assert.AreEqual("無盡之衣", xyz.ItemName);
+
+            var display = xyz as IGridViewDisplay;
+            Assert.AreEqual("無盡之衣", display.ItemName);
+            Assert.AreEqual("1 ~ 1 卡蘭德的魔鏡", display.QueryPrice);
+
+            var query = xyz.Query;
+            Assert.AreEqual("無盡之衣", query.Name);
+            Assert.AreEqual(1, query.MaxPrice);
+            Assert.AreEqual(Loader.Data.CurrencyType.MirrorOfKalandra, query.Currency);
         }
         [TestMethod()]
         public void SetBlacklist()
@@ -70,6 +79,24 @@ namespace POE.Loader.Tests
             var blacklists = xyz.Items.Select(item => item.Account).ToList();
             xyz.SetBlacklist(blacklists);
             Assert.AreEqual(0, xyz.Items.Count);
+        }
+        [TestMethod()]
+        public void Create_NotFoundAndReload()
+        {
+            var xyz = Xyz.Create("http://poedb.tw/xyz.php?name=%E7%84%A1%E7%9B%A1%E4%B9%8B%E8%A1%A3&league=Warbands&status=1&boi=1&boc_min=1&boc_max=1");
+            Assert.IsFalse(xyz.IsFoundItems);
+            Assert.AreEqual("無盡之衣", xyz.ItemName);
+
+            xyz.Reload();
+
+            var display = xyz as IGridViewDisplay;
+            Assert.AreEqual("無盡之衣", display.ItemName);
+            Assert.AreEqual("1 ~ 1 卡蘭德的魔鏡", display.QueryPrice);
+
+            var query = xyz.Query;
+            Assert.AreEqual("無盡之衣", query.Name);
+            Assert.AreEqual(1, query.MaxPrice);
+            Assert.AreEqual(Loader.Data.CurrencyType.MirrorOfKalandra, query.Currency);
         }
     }
 }

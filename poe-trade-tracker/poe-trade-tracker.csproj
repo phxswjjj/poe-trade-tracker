@@ -93,7 +93,10 @@
     <Compile Include="FrmTest.Designer.cs">
       <DependentUpon>FrmTest.cs</DependentUpon>
     </Compile>
+    <Compile Include="Loader\Data\CurrencyType.cs" />
+    <Compile Include="Loader\Data\EnumAttribute.cs" />
     <Compile Include="Loader\Data\ItemInfo.cs" />
+    <Compile Include="Loader\Data\QueryCondition.cs" />
     <Compile Include="Loader\IGridViewDisplay.cs" />
     <Compile Include="Loader\ILoader.cs" />
     <Compile Include="Loader\Xyz.cs" />
