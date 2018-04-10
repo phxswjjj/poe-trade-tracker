@@ -37,6 +37,8 @@ namespace POE
             if (xyz != null && xyz.IsValid)
                 list.Add(xyz);
 
+            list = new BindingList<Loader.IGridViewDisplay>(list.OrderBy(item => item.ItemName).ThenBy(item => item.QueryPrice).ToList());
+
             gvUrls.AutoGenerateColumns = false;
             gvUrls.DataSource = list;
         }
