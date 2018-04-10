@@ -26,21 +26,23 @@ namespace POE
         private void AddMonitorList(string url, string itemName)
         {
             var gvUrls = (DataGridView)this.Controls.Find("GvUrls", false).First();
-            var list = gvUrls.DataSource as BindingList<Loader.IGridViewDisplay>;
-            if (list == null)
-                list = new BindingList<Loader.IGridViewDisplay>();
+            gvUrls.Invoke((Action)(() => {
+                var list = gvUrls.DataSource as BindingList<Loader.IGridViewDisplay>;
+                if (list == null)
+                    list = new BindingList<Loader.IGridViewDisplay>();
 
-            var xyz = Loader.Xyz.Create(url, itemName);
-            if (this.blacklists != null)
-                xyz.SetBlacklist(blacklists);
+                var xyz = Loader.Xyz.Create(url, itemName);
+                if (this.blacklists != null)
+                    xyz.SetBlacklist(blacklists);
 
-            if (xyz != null && xyz.IsValid)
-                list.Add(xyz);
+                if (xyz != null && xyz.IsValid)
+                    list.Add(xyz);
 
-            list = new BindingList<Loader.IGridViewDisplay>(list.OrderBy(item => item.ItemName).ThenBy(item => item.QueryPrice).ToList());
+                list = new BindingList<Loader.IGridViewDisplay>(list.OrderBy(item => item.ItemName).ThenBy(item => item.QueryPrice).ToList());
 
-            gvUrls.AutoGenerateColumns = false;
-            gvUrls.DataSource = list;
+                gvUrls.AutoGenerateColumns = false;
+                gvUrls.DataSource = list;
+            }));
         }
         private void AddMonitorList(string url)
         {
@@ -68,7 +70,7 @@ namespace POE
             }
         }
 
-        private void FrmMain_Load(object sender, EventArgs e)
+        private async void FrmMain_Load(object sender, EventArgs e)
         {
             scheduler = Quartz.Impl.StdSchedulerFactory.GetDefaultScheduler();
 
@@ -86,9 +88,13 @@ namespace POE
 
             scheduler.Start();
 
-            LoadBlacklist();
+            var task1 = new Task(LoadBlacklist);
+            task1.Start();
+            await task1;
 
-            PreloadQueryHistory();
+            var task2 = new Task(PreloadQueryHistory);
+            task2.Start();
+            await task2;
         }
 
         private void FrmMain_KeyDown(object sender, KeyEventArgs e)
