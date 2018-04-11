@@ -54,19 +54,27 @@ namespace POE.Loader
             return Create(url, "");
         }
 
-        private void Init()
+        private void Init(bool isReloadUrl)
         {
             this.IsValid = false;
             this.IsFoundItems = false;
             this.Raws = new List<string>();
             this.Items = new List<Data.ItemInfo>();
             this.Timestamp = DateTime.Now;
+            if(isReloadUrl)
+            {
+                this.Url = null;
+                this.ItemName = null;
+                this.Query = null;
+            }
+        }
+        private void Init()
+        {
+            this.Init(false);
         }
 
         private void GetInfo()
         {
-            this.Init();
-
             var req = WebRequest.CreateHttp(this.Url);
             using (var resp = req.GetResponse())
             {
@@ -121,11 +129,21 @@ namespace POE.Loader
             return xyz;
         }
 
-        public void Reload()
+        public void Reload(string newUrl)
         {
             this.PreviousResult = this.Clone();
 
+            if (!string.IsNullOrEmpty(newUrl))
+            {
+                this.Init(true);
+                this.Url = newUrl.Trim();
+            }
+
             this.GetInfo();
+        }
+        public void Reload()
+        {
+            Reload(null);
         }
 
         public void SetBlacklist(IEnumerable<string> blacklists)
