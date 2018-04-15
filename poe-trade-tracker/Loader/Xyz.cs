@@ -62,7 +62,6 @@ namespace POE.Loader
             this.Timestamp = DateTime.Now;
             if(isReloadUrl)
             {
-                this.Url = null;
                 this.ItemName = null;
                 this.Query = null;
             }
@@ -130,17 +129,15 @@ namespace POE.Loader
 
         public void Reload(string newUrl)
         {
-            if (!string.IsNullOrEmpty(newUrl))
-            {
-                this.Init(true);
-                this.Url = newUrl.Trim();
-            }
+            var isChangeUrl = !this.Url.Equals(newUrl.Trim());
+            this.Url = newUrl.Trim();
+            this.Init(isChangeUrl);
 
             this.GetInfo();
         }
         public void Reload()
         {
-            Reload(null);
+            Reload(this.Url);
         }
 
         public void SetBlacklist(IEnumerable<string> blacklists)
