@@ -21,7 +21,6 @@ namespace POE.Loader
             this.Timestamp = cloneFrom.Timestamp;
             this.Raws = cloneFrom.Raws;
             this.Items = cloneFrom.Items;
-            this.PreviousResult = cloneFrom.PreviousResult;
             this.Query = cloneFrom.Query;
         }
         private Xyz(string url, string itemName)
@@ -131,8 +130,6 @@ namespace POE.Loader
 
         public void Reload(string newUrl)
         {
-            this.PreviousResult = this.Clone();
-
             if (!string.IsNullOrEmpty(newUrl))
             {
                 this.Init(true);
@@ -227,8 +224,6 @@ namespace POE.Loader
         public List<string> Raws { get; private set; }
 
         public List<Data.ItemInfo> Items { get; private set; }
-
-        public Xyz PreviousResult { get; private set; }
 
         public Data.QueryCondition Query { get; private set; }
 
